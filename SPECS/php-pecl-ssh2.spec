@@ -2,6 +2,9 @@
 %global ini_name  40-%{pecl_name}.ini
 %global with_zts  0%{!?_without_zts:%{?__ztsphp:1}}
 
+%define _debugsource_template %{nil}
+%define debug_package %{nil}
+
 Name:           php-pecl-ssh2
 Version:        1.3.1
 Release:        1%{?dist}
