@@ -3,16 +3,18 @@
 %global with_zts  0%{!?_without_zts:%{?__ztsphp:1}}
 
 Name:           php-pecl-ssh2
-Version:        1.2
-Release:        2%{?dist}
+Version:        1.3.1
+Release:        1%{?dist}
 Summary:        Bindings for the libssh2 library
 
 License:        PHP
-URL:            http://pecl.php.net/package/%{pecl_name}
-Source0:        http://pecl.php.net/get/%{pecl_name}-%{version}.tgz
+URL:            https://pecl.php.net/package/%{pecl_name}
+Source0:        https://pecl.php.net/get/%{pecl_name}-%{version}.tgz
 
+BuildRequires:  make
+BuildRequires:  gcc
 BuildRequires:  libssh2-devel >= 1.2
-BuildRequires:  php-devel > 7
+BuildRequires:  php-devel >= 7.0
 BuildRequires:  php-pear
 
 Provides:       php-%{pecl_name}               = %{version}
@@ -33,7 +35,7 @@ Documentation: http://php.net/ssh2
 
 
 %prep
-%setup -c -q 
+%setup -c -q
 mv %{pecl_name}-%{version} NTS
 
 # Don't install/register tests
@@ -126,6 +128,9 @@ done
 
 
 %changelog
+* Thu Mar  4 2021 Remi Collet <remi@remirepo.net> - 1.3.1-1
+- Update to 1.3.1
+
 * Thu Oct 03 2019 Remi Collet <remi@remirepo.net> - 1.2-2
 - rebuild for https://fedoraproject.org/wiki/Changes/php74
 

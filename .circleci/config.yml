@@ -1,7 +1,13 @@
 version: 2.1
 
 orbs:
-  docker-rpmbuild: aursu/rpmbuild@1.1.0
+  docker-rpmbuild: aursu/rpmbuild@1.1.7
+
+parameters:
+  artifactory-url:
+    description: Artifactory URL
+    type: string
+    default: https://rpmb.jfrog.io
 
 workflows:
   ssh2build:
@@ -25,13 +31,13 @@ workflows:
           build_service: centos8ssh2php73
           bintray_uploader: centos8bintray
       - docker-rpmbuild/build:
-          name: centos7ssh2php74
-          build_file: docker-compose.php74.yml
-          build_service: centos7ssh2php74
+          name: centos7ssh2php80
+          build_file: docker-compose.php80.yml
+          build_service: centos7ssh2php80
           bintray_uploader: centos7bintray
       - docker-rpmbuild/build:
-          name: centos8ssh2php74
-          build_file: docker-compose.php74.yml
-          build_service: centos8ssh2php74
+          name: centos8ssh2php80
+          build_file: docker-compose.php80.yml
+          build_service: centos8ssh2php80
           bintray_uploader: centos8bintray
 

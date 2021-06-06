@@ -10,14 +10,18 @@ addons:
 
 env:
   global:
-    - PACKAGE_VCS_URL=https://github.com/aursu/rpmbuild-php-ssh2
+    - ARTIFACTORY_URL=https://rpmb.jfrog.io
+    - OS7=7.9.2009
+    - OS8=8.3.2011
+    - OS7TAG=7.9.2009
+    - OS8TAG=8.3.2011
   jobs:
-    - BUILD_COMPOSE_FILE=docker-compose.yml       BINTRAY_REPO=php71custom BUILD=centos7ssh2      UPLOADER=centos7bintray
-    - BUILD_COMPOSE_FILE=docker-compose.yml       BINTRAY_REPO=php71custom BUILD=centos8ssh2      UPLOADER=centos8bintray
+    - BUILD_COMPOSE_FILE=docker-compose.yml       BINTRAY_REPO=php74custom BUILD=centos7ssh2      UPLOADER=centos7bintray
+    - BUILD_COMPOSE_FILE=docker-compose.yml       BINTRAY_REPO=php74custom BUILD=centos8ssh2      UPLOADER=centos8bintray
     - BUILD_COMPOSE_FILE=docker-compose.php73.yml BINTRAY_REPO=php73custom BUILD=centos7ssh2php73 UPLOADER=centos7bintray
     - BUILD_COMPOSE_FILE=docker-compose.php73.yml BINTRAY_REPO=php73custom BUILD=centos8ssh2php73 UPLOADER=centos8bintray
-    - BUILD_COMPOSE_FILE=docker-compose.php74.yml BINTRAY_REPO=php74custom BUILD=centos7ssh2php74 UPLOADER=centos7bintray
-    - BUILD_COMPOSE_FILE=docker-compose.php74.yml BINTRAY_REPO=php74custom BUILD=centos8ssh2php74 UPLOADER=centos8bintray
+    - BUILD_COMPOSE_FILE=docker-compose.php80.yml BINTRAY_REPO=php8custom BUILD=centos7ssh2php80 UPLOADER=centos7bintray
+    - BUILD_COMPOSE_FILE=docker-compose.php80.yml BINTRAY_REPO=php8custom BUILD=centos8ssh2php80 UPLOADER=centos8bintray
 
 before_script:
   - docker-compose -f ${BUILD_COMPOSE_FILE} build --no-cache ${BUILD}
@@ -30,7 +34,7 @@ before_deploy:
 
 deploy:
   provider: script
-  script: docker-compose -f rpmbuild/docker-compose.bintray.yml run --rm -e BINTRAY_USER=$BINTRAY_USER -e BINTRAY_API_KEY=$BINTRAY_API_KEY -e BINTRAY_REPO=$BINTRAY_REPO -e PACKAGE_VCS_URL=$PACKAGE_VCS_URL ${UPLOADER}
+  script: docker-compose -f rpmbuild/docker-compose.bintray.yml run --rm -e BINTRAY_USER=$BINTRAY_USER -e BINTRAY_API_KEY=$BINTRAY_API_KEY -e BINTRAY_REPO=$BINTRAY_REPO -e ARTIFACTORY_URL=$ARTIFACTORY_URL ${UPLOADER}
   on:
     all_branches: true
 
