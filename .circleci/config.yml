@@ -17,27 +17,16 @@ workflows:
           build_service: centos7ssh2
           bintray_uploader: centos7bintray
       - docker-rpmbuild/build:
-          name: centos8ssh2
-          build_service: centos8ssh2
-          bintray_uploader: centos8bintray
+          name: stream8ssh2
+          build_service: stream8ssh2
+          bintray_uploader: stream8bintray
       - docker-rpmbuild/build:
           name: centos7ssh2php81
           build_file: docker-compose.php81.yml
           build_service: centos7ssh2php81
           bintray_uploader: centos7bintray
       - docker-rpmbuild/build:
-          name: centos8ssh2php81
+          name: stream8ssh2php81
           build_file: docker-compose.php81.yml
-          build_service: centos8ssh2php81
-          bintray_uploader: centos8bintray
-      - docker-rpmbuild/build:
-          name: centos7ssh2php80
-          build_file: docker-compose.php80.yml
-          build_service: centos7ssh2php80
-          bintray_uploader: centos7bintray
-      - docker-rpmbuild/build:
-          name: centos8ssh2php80
-          build_file: docker-compose.php80.yml
-          build_service: centos8ssh2php80
-          bintray_uploader: centos8bintray
-
+          build_service: stream8ssh2php81
+          bintray_uploader: stream8bintray
