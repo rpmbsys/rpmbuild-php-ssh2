@@ -6,11 +6,11 @@
 %define debug_package %{nil}
 
 Name:           php-pecl-ssh2
-Version:        1.3.1
-Release:        1%{?dist}
+Version:        1.4
+Release:        3%{?dist}
 Summary:        Bindings for the libssh2 library
 
-License:        PHP
+License:        PHP-3.01
 URL:            https://pecl.php.net/package/%{pecl_name}
 Source0:        https://pecl.php.net/get/%{pecl_name}-%{version}.tgz
 
@@ -131,6 +131,9 @@ done
 
 
 %changelog
+* Tue Oct 03 2023 Remi Collet <remi@remirepo.net> - 1.4-3
+- rebuild for https://fedoraproject.org/wiki/Changes/php83
+
 * Thu Mar  4 2021 Remi Collet <remi@remirepo.net> - 1.3.1-1
 - Update to 1.3.1
 
