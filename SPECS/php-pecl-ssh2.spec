@@ -1,18 +1,18 @@
-%define pecl_name ssh2
-%global ini_name  40-%{pecl_name}.ini
-%global with_zts  0%{!?_without_zts:%{?__ztsphp:1}}
-
-%define _debugsource_template %{nil}
-%define debug_package %{nil}
+%define pecl_name  ssh2
+%global ini_name   40-%{pecl_name}.ini
+%global sources    %{pecl_name}-%{version}
+%global _configure ../%{sources}/configure
 
 Name:           php-pecl-ssh2
-Version:        1.4
-Release:        3%{?dist}
+Version:        1.4.1
+Release:        8%{?dist}
 Summary:        Bindings for the libssh2 library
 
 License:        PHP-3.01
 URL:            https://pecl.php.net/package/%{pecl_name}
-Source0:        https://pecl.php.net/get/%{pecl_name}-%{version}.tgz
+Source0:        https://pecl.php.net/get/%{sources}.tgz
+
+ExcludeArch:    %{ix86}
 
 BuildRequires:  make
 BuildRequires:  gcc
@@ -38,15 +38,14 @@ Documentation: http://php.net/ssh2
 
 
 %prep
-%setup -c -q
-mv %{pecl_name}-%{version} NTS
+%setup -c -q 
 
 # Don't install/register tests
 sed -e 's/role="test"/role="src"/' \
     -e '/LICENSE/s/role="doc"/role="src"/' \
     -i package.xml
 
-cd NTS
+cd %{sources}
 extver=$(sed -n '/#define PHP_SSH2_VERSION/{s/.*\t"//;s/".*$//;p}' php_ssh2.h)
 if test "x${extver}" != "x%{version}"; then
    : Error: Upstream version is now ${extver}, expecting %{version}.
@@ -60,82 +59,121 @@ cat > %{ini_name} << 'EOF'
 extension=%{pecl_name}.so
 EOF
 
-%if %{with_zts}
-: Duplicate source tree for NTS / ZTS build
-cp -pr NTS ZTS
-%endif
-
 
 %build
-cd NTS
-%{_bindir}/phpize
-%configure --with-php-config=%{_bindir}/php-config
-make %{?_smp_mflags}
+cd %{sources}
+%{__phpize}
+sed -e 's/INSTALL_ROOT/DESTDIR/' -i build/Makefile.global
 
-%if %{with_zts}
-cd ../ZTS
-%{_bindir}/zts-phpize
-%configure --with-php-config=%{_bindir}/zts-php-config
-make %{?_smp_mflags}
-%endif
+%configure --with-php-config=%{__phpconfig}
+%make_build
 
 
 %install
-make -C NTS install INSTALL_ROOT=%{buildroot}
+cd %{sources}
 
-# Install XML package description
-install -Dpm 644 package.xml %{buildroot}%{pecl_xmldir}/%{name}.xml
+: Install the extension
+%make_install
 
-# install config file
-install -Dpm644 %{ini_name} %{buildroot}%{php_inidir}/%{ini_name}
+: Install XML package description
+install -Dpm 644 ../package.xml %{buildroot}%{pecl_xmldir}/%{name}.xml
 
-%if %{with_zts}
-make -C ZTS install INSTALL_ROOT=%{buildroot}
-install -Dpm644 %{ini_name} %{buildroot}%{php_ztsinidir}/%{ini_name}
-%endif
+: Install config file
+install -Dpm644 ../%{ini_name} %{buildroot}%{php_inidir}/%{ini_name}
 
-# Documentation
-for i in $(grep 'role="doc"' package.xml | sed -e 's/^.*name="//;s/".*$//')
-do install -Dpm 644 NTS/$i %{buildroot}%{pecl_docdir}/%{pecl_name}/$i
+: Install the Documentation
+for i in $(grep 'role="doc"' ../package.xml | sed -e 's/^.*name="//;s/".*$//')
+do install -Dpm 644 $i %{buildroot}%{pecl_docdir}/%{pecl_name}/$i
 done
 
 
 %check
 : Minimal load test for NTS extension
 %{__php} --no-php-ini \
-    --define extension_dir=%{buildroot}%{php_extdir} \
-    --define extension=%{pecl_name}.so \
-    --modules | grep %{pecl_name}
-
-%if %{with_zts}
-: Minimal load test for ZTS extension
-%{__ztsphp} --no-php-ini \
-    --define extension_dir=%{buildroot}%{php_ztsextdir} \
-    --define extension=%{pecl_name}.so \
-    --modules | grep %{pecl_name}
-%endif
+    --define extension=%{buildroot}%{php_extdir}/%{pecl_name}.so \
+    --modules | grep '^%{pecl_name}$'
 
 
 %files
-%license NTS/LICENSE
+%license %{sources}/LICENSE
 %doc %{pecl_docdir}/%{pecl_name}
 %{pecl_xmldir}/%{name}.xml
 
 %config(noreplace) %{_sysconfdir}/php.d/%{ini_name}
 %{php_extdir}/%{pecl_name}.so
 
-%if %{with_zts}
-%config(noreplace) %{php_ztsinidir}/%{ini_name}
-%{php_ztsextdir}/%{pecl_name}.so
-%endif
-
 
 %changelog
+* Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
+
+* Sat Jan 18 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Thu Oct 17 2024 Remi Collet <remi@fedoraproject.org> - 1.4.1-6
+- modernize the spec file
+
+* Mon Oct 14 2024 Remi Collet <remi@fedoraproject.org> - 1.4.1-5
+- rebuild for https://fedoraproject.org/wiki/Changes/php84
+
+* Thu Aug 22 2024 Remi Collet <remi@remirepo.net> - 1.4.1-4
+- rebuild for broken ABI in 8.3.10, fixed in 8.3.11RC2
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Apr 16 2024 Remi Collet <remi@remirepo.net> - 1.4.1-2
+- drop 32-bit support
+  https://fedoraproject.org/wiki/Changes/php_no_32_bit
+
+* Mon Feb 12 2024 Remi Collet <remi@remirepo.net> - 1.4.1-1
+- Update to 1.4.1
+- build out of sources tree
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.4-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.4-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
 * Tue Oct 03 2023 Remi Collet <remi@remirepo.net> - 1.4-3
 - rebuild for https://fedoraproject.org/wiki/Changes/php83
 
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Apr 21 2023 Remi Collet <remi@remirepo.net> - 1.4-1
+- Update to 1.4
+
+* Thu Apr 20 2023 Remi Collet <remi@remirepo.net> - 1.3.1-7
+- use SPDX license ID
+
+* Wed Oct 05 2022 Remi Collet <remi@remirepo.net> - 1.3.1-6
+- rebuild for https://fedoraproject.org/wiki/Changes/php82
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Oct 28 2021 Remi Collet <remi@remirepo.net> - 1.3.1-3
+- rebuild for https://fedoraproject.org/wiki/Changes/php81
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
 * Thu Mar  4 2021 Remi Collet <remi@remirepo.net> - 1.3.1-1
 - Update to 1.3.1
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
 * Thu Oct 03 2019 Remi Collet <remi@remirepo.net> - 1.2-2
 - rebuild for https://fedoraproject.org/wiki/Changes/php74
