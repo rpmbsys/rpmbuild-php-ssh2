@@ -4,8 +4,8 @@
 %global _configure ../%{sources}/configure
 
 Name:           php-pecl-ssh2
-Version:        1.4.1
-Release:        8%{?dist}
+Version:        1.5.0
+Release:        1%{?dist}
 Summary:        Bindings for the libssh2 library
 
 License:        PHP-3.01
@@ -17,7 +17,7 @@ ExcludeArch:    %{ix86}
 BuildRequires:  make
 BuildRequires:  gcc
 BuildRequires:  libssh2-devel >= 1.2
-BuildRequires:  php-devel >= 7.0
+BuildRequires:  php-devel >= 8.0
 BuildRequires:  php-pear
 
 Provides:       php-%{pecl_name}               = %{version}
@@ -104,6 +104,9 @@ done
 
 
 %changelog
+* Tue Apr  7 2026 Remi Collet <remi@remirepo.net> - 1.5.0-1
+- Update to 1.5.0
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.1-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 
