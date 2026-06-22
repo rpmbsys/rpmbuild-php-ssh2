@@ -4,8 +4,9 @@
 %global _configure ../%{sources}/configure
 
 Name:           php-pecl-ssh2
+Epoch:          1
 Version:        1.5.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Bindings for the libssh2 library
 
 License:        PHP-3.01
@@ -104,6 +105,10 @@ done
 
 
 %changelog
+* Mon Jun 22 2026 Alexander Ursu <alexander.ursu@gmail.com> - 1:1.5.0-2
+- add Epoch: 1 so the local build is preferred over the EPEL package
+  (EPEL ships 1.5.0-1.el10_2, built against the distro system PHP ABI)
+
 * Tue Apr  7 2026 Remi Collet <remi@remirepo.net> - 1.5.0-1
 - Update to 1.5.0
 
